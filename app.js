@@ -48,7 +48,8 @@ async function processData(shop, shopurlcode) {
         }
 
         // Step 3: Select limited information and create a new object
-        let tastics = dataFromSecondAPI.page.regions.main.elements[0].tastics;
+        let mainElements = dataFromSecondAPI.page.regions.main.elements;
+
         let canonical = dataFromSecondAPI.data.tastic[shopurlcode]?.canonical || dataFromSecondAPI.data.tastic[shopurlcode]?.canonical;
              // Step 3: Select limited information and create a new object
              const processedObject = {
@@ -75,14 +76,21 @@ async function processData(shop, shopurlcode) {
                  seoText_pl : '',
              };
 
-        for (const tastic of tastics) {
-            if (tastic.tasticType === 'hirmer/seoText') {
-                processedObject.seoText_de = tastic.configuration.seoText.de;
-                processedObject.seoText_en = tastic.configuration.seoText.en;
-                processedObject.seoText_cs = tastic.configuration.seoText.cs;
-                processedObject.seoText_pl = tastic.configuration.seoText.pl;
-            }
-        }
+             for (const element of mainElements) {
+                 let tastics = element.tastics;
+                 let textfound = false;
+                 for (const tastic of tastics) {
+                     if (tastic.tasticType === 'hirmer/seoText') {
+                         textfound = true;
+                         processedObject.seoText_de = tastic.configuration.seoText.de;
+                         processedObject.seoText_en = tastic.configuration.seoText.en;
+                         processedObject.seoText_cs = tastic.configuration.seoText.cs;
+                         processedObject.seoText_pl = tastic.configuration.seoText.pl;
+                     }
+                     if(textfound) break;
+                 }
+                    if(textfound) break;
+             }
 
         // Add the canonical URL
         if (canonical) {
@@ -111,5 +119,5 @@ async function processData(shop, shopurlcode) {
 // Run the main process for all shops ( can be just one value if the requirement is for only one shop )
 for (let i=0; i<shops.length; i++) {
     console.log(`Processing shop ${shops[i]}...`);
-    processData(shops[i], shopurlcode[i]).then(r => console.log(`Finished processing shop ${shops[i]}`));
+    processData(shops[i], shopurlcode[i]).then(() => console.log(`Finished processing shop ${shops[i]}`));
 }
