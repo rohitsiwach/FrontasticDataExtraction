@@ -76,6 +76,7 @@ async function processData(shop, shopurlcode) {
                  seoText_pl : '',
              };
 
+             // find seoText tastic in all the main elements
              for (const element of mainElements) {
                  let tastics = element.tastics;
                  let textfound = false;
